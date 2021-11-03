@@ -52,6 +52,11 @@ func init() {
 	locateCmd.MarkFlagRequired("secret-access-key-id-file")
 }
 
+// behavior to implement:
+// 1. parse the transfer file list
+// 2. lookup cached result
+// 3. if miss, or X days old, actually lookup bucket
+// 4. cache lookup if successful
 func locateBucket(cmd *cobra.Command, args []string) {
 	bucket := aws.String(args[0])
 
