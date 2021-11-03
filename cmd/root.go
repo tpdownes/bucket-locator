@@ -16,9 +16,9 @@ package cmd
 
 import (
 	"fmt"
-        "log"
-	"os"
 	"github.com/spf13/cobra"
+	"log"
+	"os"
 
 	"github.com/spf13/viper"
 )
@@ -33,11 +33,11 @@ examples and usage of using your application. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-        Run: func(cmd *cobra.Command, args []string) {
-                if err := cmd.Help(); err != nil {
-                        log.Fatalf("cmd.Help function failed: %s", err)
-                }
-        },
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := cmd.Help(); err != nil {
+			log.Fatalf("cmd.Help function failed: %s", err)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
