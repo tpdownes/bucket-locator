@@ -28,7 +28,7 @@ import (
 )
 
 var secretAccessKeyFile string
-var secretAccessKeyIdFile string
+var secretAccessKeyIDFile string
 
 // locateCmd represents the locate command
 var locateCmd = &cobra.Command{
@@ -47,7 +47,7 @@ to quickly create a Cobra application.`,
 func init() {
 	rootCmd.AddCommand(locateCmd)
 	locateCmd.Flags().StringVar(&secretAccessKeyFile, "secret-access-key-file", "", "secret key file")
-	locateCmd.Flags().StringVar(&secretAccessKeyIdFile, "secret-access-key-id-file", "", "key id file")
+	locateCmd.Flags().StringVar(&secretAccessKeyIDFile, "secret-access-key-id-file", "", "key id file")
 	locateCmd.MarkFlagRequired("secret-access-key-file")
 	locateCmd.MarkFlagRequired("secret-access-key-id-file")
 }
@@ -55,13 +55,13 @@ func init() {
 func locateBucket(cmd *cobra.Command, args []string) {
 	bucket := aws.String(args[0])
 
-	secretAccessKeyId, err := ioutil.ReadFile(secretAccessKeyIdFile)
+	secretAccessKeyID, err := ioutil.ReadFile(secretAccessKeyIDFile)
 	secretAccessKey, err := ioutil.ReadFile(secretAccessKeyFile)
 	svc := s3.New(session.New(), &aws.Config{
 		Region:   aws.String("us-central1"),
 		Endpoint: aws.String("storage.googleapis.com"),
 		Credentials: credentials.NewStaticCredentials(
-			strings.TrimSpace(string(secretAccessKeyId)),
+			strings.TrimSpace(string(secretAccessKeyID)),
 			strings.TrimSpace(string(secretAccessKey)),
 			""),
 	})
