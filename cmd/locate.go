@@ -16,13 +16,15 @@ package cmd
 
 import (
 	"fmt"
+	"io/ioutil"
+	"strings"
 
-        "github.com/aws/aws-sdk-go/aws"
-        "github.com/aws/aws-sdk-go/aws/awserr"
-        "github.com/aws/aws-sdk-go/aws/credentials"
-        "github.com/aws/aws-sdk-go/aws/session"
-        "github.com/aws/aws-sdk-go/service/s3"
-        "github.com/spf13/cobra"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/awserr"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
+	"github.com/spf13/cobra"
 )
 
 var secretAccessKeyFile string
@@ -31,6 +33,7 @@ var secretAccessKeyIdFile string
 // locateCmd represents the locate command
 var locateCmd = &cobra.Command{
 	Use:   "locate",
+	Args:  cobra.ExactArgs(1),
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -43,37 +46,42 @@ to quickly create a Cobra application.`,
 
 func init() {
 	rootCmd.AddCommand(locateCmd)
-	locateCmd.PersistentFlags().StringVar(&secretAccessKeyFile, "secret-access-key-file", "", "secret key file")
-	locateCmd.PersistentFlags().StringVar(&secretAccessKeyIdFile, "secret-access-key-id-file", "", "key id file")
+	locateCmd.Flags().StringVar(&secretAccessKeyFile, "secret-access-key-file", "", "secret key file")
+	locateCmd.Flags().StringVar(&secretAccessKeyIdFile, "secret-access-key-id-file", "", "key id file")
+	locateCmd.MarkFlagRequired("secret-access-key-file")
+	locateCmd.MarkFlagRequired("secret-access-key-id-file")
 }
 
 func locateBucket(cmd *cobra.Command, args []string) {
-        svc := s3.New(session.New(), &aws.Config{
-                Region: aws.String("us-central1"),
-                Endpoint: aws.String("storage.googleapis.com"),
-                Credentials: credentials.NewStaticCredentials(
-                        "GOOG2GL7XUZNOE2EQQ2DSYLT",
-                        "e+BtjA8wOo224SVnwmVZESMqxiQvis6jB2wX8HsS",
-                        "",
-                ),
-        })
-        input := &s3.GetBucketLocationInput{
-            Bucket: aws.String("htcondor-us-central1-data-89ab"),
-        }
+	bucket := aws.String(args[0])
 
-        result, err := svc.GetBucketLocation(input)
-        if err != nil {
-            if aerr, ok := err.(awserr.Error); ok {
-                switch aerr.Code() {
-                default:
-                    fmt.Println(aerr.Error())
-                }
-            } else {
-                // Print the error, cast err to awserr.Error to get the Code and
-                // Message from an error.
-                fmt.Println(err.Error())
-            }
-            return
-        }
-        fmt.Println(result)
+	secretAccessKeyId, err := ioutil.ReadFile(secretAccessKeyIdFile)
+	secretAccessKey, err := ioutil.ReadFile(secretAccessKeyFile)
+	svc := s3.New(session.New(), &aws.Config{
+		Region:   aws.String("us-central1"),
+		Endpoint: aws.String("storage.googleapis.com"),
+		Credentials: credentials.NewStaticCredentials(
+			strings.TrimSpace(string(secretAccessKeyId)),
+			strings.TrimSpace(string(secretAccessKey)),
+			""),
+	})
+	input := &s3.GetBucketLocationInput{
+		Bucket: bucket,
+	}
+
+	result, err := svc.GetBucketLocation(input)
+	if err != nil {
+		if aerr, ok := err.(awserr.Error); ok {
+			switch aerr.Code() {
+			default:
+				fmt.Println(aerr.Error())
+			}
+		} else {
+			// Print the error, cast err to awserr.Error to get the Code and
+			// Message from an error.
+			fmt.Println(err.Error())
+		}
+		return
+	}
+	fmt.Println(result)
 }
