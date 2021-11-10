@@ -88,5 +88,6 @@ func locateBucket(cmd *cobra.Command, args []string) {
 		}
 		return
 	}
-	fmt.Println(result)
+	fmt.Println("+CloudDataProvider=\"GCP\"")
+	fmt.Println("+CloudDataLocation=\"" + *result.LocationConstraint + "\"")
 }
