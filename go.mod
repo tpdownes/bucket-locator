@@ -5,5 +5,5 @@ go 1.16
 require (
 	github.com/aws/aws-sdk-go v1.48.13
 	github.com/spf13/cobra v1.8.0
-	github.com/spf13/viper v1.17.0
+	github.com/spf13/viper v1.18.2
 )
